@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestão de Eventos e Cadastros</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body class="bg-gray-100 min-h-screen font-sans">
+
+    <div class="max-w-md mx-auto mt-10 p-6 bg-white rounded-lg shadow-xl">
+        
+        <div class="text-center mb-6">
+            <h1 class="text-2xl font-bold text-gray-800" id="tituloPagina">Sistema de Eventos</h1>
+            <p class="text-gray-500 text-sm" id="subtituloPagina">Carregando...</p>
+        </div>
+
+        <div id="areaCliente" class="hidden">
+            <form id="formCadastro" class="space-y-4">
+                <input type="hidden" id="eventoIdInput">
+                
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">Seu Nome Completo</label>
+                    <input type="text" id="clienteNome" required class="w-full p-2 border border-gray-300 rounded mt-1 focus:ring-blue-500 focus:border-blue-500">
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">WhatsApp / Telefone</label>
+                    <input type="tel" id="clienteTelefone" required class="w-full p-2 border border-gray-300 rounded mt-1">
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">E-mail</label>
+                    <input type="email" id="clienteEmail" class="w-full p-2 border border-gray-300 rounded mt-1">
+                </div>
+
+                <button type="submit" class="w-full bg-green-600 text-white p-3 rounded hover:bg-green-700 font-bold transition">
+                    Confirmar Presença
+                </button>
+            </form>
+            <div id="msgSucesso" class="hidden mt-4 p-3 bg-green-100 text-green-800 rounded text-center">
+                Cadastro realizado com sucesso!
+            </div>
+        </div>
+
+        <div id="areaAdmin" class="hidden">
+            <div class="border-b pb-4 mb-4">
+                <h2 class="font-bold text-lg mb-2">Criar Novo Evento</h2>
+                <div class="flex gap-2">
+                    <input type="text" id="novoEventoNome" placeholder="Nome do Evento (ex: Live Muros)" class="flex-1 p-2 border rounded">
+                    <button onclick="criarEvento()" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">Criar</button>
+                </div>
+            </div>
+
+            <div>
+                <h2 class="font-bold text-lg mb-2">Seus Eventos (Links)</h2>
+                <ul id="listaEventos" class="space-y-2 text-sm">
+                    <li class="text-gray-500">Carregando eventos...</li>
+                </ul>
+            </div>
+            
+            <div class="mt-8 pt-4 border-t text-center">
+                 <button onclick="verTodosCadastros()" class="text-blue-600 underline text-sm">Ver todos os inscritos (Log)</button>
+                 <div id="listaCadastros" class="mt-2 text-left text-xs bg-gray-50 p-2 rounded hidden max-h-40 overflow-y-auto"></div>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        // --- 1. CONFIGURAÇÃO DO SUPABASE ---
+        // SUBSTITUA ESTES DADOS PELOS SEUS DO SUPABASE
+        const supabaseUrl = 'https://kixlaiwclsgbabtdfmtn.supabase.co'; 
+        const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtpeGxhaXdjbHNnYmFidGRmbXRuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njc1NjA4MzgsImV4cCI6MjA4MzEzNjgzOH0.r9OF9C88prJs4tuBkz6xu_lKjjzixz5UHnVKDbLtx2E';
+        
+        // CORREÇÃO FEITA: Variável renomeada para 'supabaseClient' para evitar conflito
+        const supabaseClient = supabase.createClient(supabaseUrl, supabaseKey);
+
+        // --- 2. LÓGICA DE INICIALIZAÇÃO ---
+        const urlParams = new URLSearchParams(window.location.search);
+        const eventoIdParam = urlParams.get('evento_id');
+
+        const areaCliente = document.getElementById('areaCliente');
+        const areaAdmin = document.getElementById('areaAdmin');
+        const titulo = document.getElementById('tituloPagina');
+        const subtitulo = document.getElementById('subtituloPagina');
+
+        // Verifica se é Cliente (tem link) ou Admin (sem link)
+        if (eventoIdParam) {
+            iniciarModoCliente(eventoIdParam);
+        } else {
+            iniciarModoAdmin();
+        }
+
+        // --- 3. FUNÇÕES DO MODO CLIENTE ---
+        async function iniciarModoCliente(id) {
+            // Buscar nome do evento
+            const { data, error } = await supabaseClient
+                .from('eventos')
+                .select('nome')
+                .eq('id', id)
+                .single();
+
+            if (error || !data) {
+                titulo.innerText = "Evento não encontrado";
+                subtitulo.innerText = "Verifique o link digitado.";
+                console.error("Erro ao buscar evento:", error);
+                return;
+            }
+
+            // Configurar tela
+            areaCliente.classList.remove('hidden');
+            titulo.innerText = "Inscrição";
+            subtitulo.innerText = `Evento: ${data.nome}`;
+            document.getElementById('eventoIdInput').value = id;
+        }
+
+        document.getElementById('formCadastro').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const nome = document.getElementById('clienteNome').value;
+            const telefone = document.getElementById('clienteTelefone').value;
+            const email = document.getElementById('clienteEmail').value;
+            const evento_id = document.getElementById('eventoIdInput').value;
+
+            const { error } = await supabaseClient
+                .from('participantes')
+                .insert([{ nome, telefone, email, evento_id }]);
+
+            if (error) {
+                alert('Erro ao salvar: ' + error.message);
+            } else {
+                document.getElementById('formCadastro').reset();
+                document.getElementById('formCadastro').classList.add('hidden');
+                document.getElementById('msgSucesso').classList.remove('hidden');
+            }
+        });
+
+        // --- 4. FUNÇÕES DO MODO ADMIN ---
+        function iniciarModoAdmin() {
+            areaAdmin.classList.remove('hidden');
+            titulo.innerText = "Painel Administrativo";
+            subtitulo.innerText = "Gerencie seus links de cadastro";
+            carregarEventos();
+        }
+
+        async function criarEvento() {
+            const nomeInput = document.getElementById('novoEventoNome');
+            const nome = nomeInput.value;
+            if (!nome) return alert("Digite um nome");
+
+            const { error } = await supabaseClient.from('eventos').insert([{ nome }]);
+            
+            if (error) {
+                alert("Erro: " + error.message);
+            } else {
+                nomeInput.value = "";
+                carregarEventos();
+            }
+        }
+
+        async function carregarEventos() {
+            const { data, error } = await supabaseClient
+                .from('eventos')
+                .select('*')
+                .order('data_criacao', { ascending: false });
+
+            const lista = document.getElementById('listaEventos');
+            lista.innerHTML = "";
+
+            if (data) {
+                data.forEach(evento => {
+                    // Gera o link dinamicamente baseado na URL atual do site
+                    const link = `${window.location.origin}${window.location.pathname}?evento_id=${evento.id}`;
+                    
+                    const li = document.createElement('li');
+                    li.className = "bg-gray-50 p-3 rounded border flex justify-between items-center";
+                    li.innerHTML = `
+                        <span class="font-medium">${evento.nome}</span>
+                        <button onclick="copiarLink('${link}')" class="text-xs bg-blue-100 text-blue-700 px-2 py-1 rounded hover:bg-blue-200">
+                            Copiar Link
+                        </button>
+                    `;
+                    lista.appendChild(li);
+                });
+            } else if (error) {
+                console.error("Erro ao carregar eventos:", error);
+            }
+        }
+
+        async function verTodosCadastros() {
+            const divLista = document.getElementById('listaCadastros');
+            divLista.classList.remove('hidden');
+            divLista.innerHTML = "Carregando...";
+
+            const { data, error } = await supabaseClient
+                .from('participantes')
+                .select('nome, telefone, eventos(nome)')
+                .order('data_cadastro', { ascending: false });
+
+            if(data) {
+                divLista.innerHTML = data.map(p => `
+                    <div class="border-b py-1">
+                        <strong>${p.nome}</strong> (${p.telefone}) <br>
+                        <span class="text-gray-500">Evento: ${p.eventos?.nome}</span>
+                    </div>
+                `).join('');
+            } else if (error) {
+                divLista.innerHTML = "Erro ao carregar cadastros.";
+                console.error(error);
+            }
+        }
+
+        function copiarLink(texto) {
+            navigator.clipboard.writeText(texto).then(() => {
+                alert("Link copiado para a área de transferência!");
+            });
+        }
+    </script>
+</body>
+</html>
