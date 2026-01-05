@@ -47,7 +47,7 @@
                 <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/e/e8/New_Holland_Agriculture_logo.svg/2560px-New_Holland_Agriculture_logo.svg.png" 
                      class="reveal-zoom delay-1 h-14 mb-6 object-contain filter brightness-0 invert opacity-90">
 
-                <div class="reveal-zoom delay-2 text-blue-300 text-sm uppercase tracking-[0.3em] font-bold mb-4">Fortral</div>
+                <div class="reveal-zoom delay-2 text-blue-300 text-xs uppercase tracking-[0.2em] font-bold mb-4">Convida para:</div>
 
                 <img src="https://www.fortral.com.br/wp-content/uploads/2025/06/logo.png" 
                      class="reveal-zoom delay-2 h-10 mb-10 object-contain">
@@ -357,6 +357,7 @@
             
             if(!nome || !dataLocal) return alert("Preencha campos.");
             
+            // CORREÇÃO: Fuso horário (envia ISO UTC)
             const dataISO = new Date(dataLocal).toISOString();
 
             const { error } = await supabaseClient.from('eventos').insert([{ nome, data_evento: dataISO }]);
