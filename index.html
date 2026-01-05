@@ -9,7 +9,39 @@
     <script src="https://unpkg.com/@phosphor-icons/web"></script>
     <style>
         .table-container { overflow-x: auto; }
-        /* Animação suave para a capa */
+        
+        /* --- ANIMAÇÕES DA INTRODUÇÃO --- */
+        
+        /* 1. Zoom In (Para os Logos) */
+        @keyframes zoomIn {
+            from { opacity: 0; transform: scale(0.5); }
+            to { opacity: 1; transform: scale(1); }
+        }
+
+        /* 2. Fade In Up (Para textos) */
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Classes utilitárias para aplicar a animação */
+        .reveal-zoom {
+            opacity: 0; /* Começa invisível */
+            animation: zoomIn 1s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+        
+        .reveal-up {
+            opacity: 0; /* Começa invisível */
+            animation: fadeInUp 1s ease-out forwards;
+        }
+
+        /* Delays (Tempos de espera para cada item) */
+        .delay-1 { animation-delay: 0.2s; } /* New Holland */
+        .delay-2 { animation-delay: 1.2s; } /* Fortral */
+        .delay-3 { animation-delay: 2.2s; } /* Título Evento */
+        .delay-4 { animation-delay: 2.8s; } /* Botão */
+
+        /* Saída suave da capa */
         .fade-out {
             opacity: 0;
             pointer-events: none;
@@ -40,33 +72,35 @@
             <button onclick="verificarSenha()" class="w-full bg-slate-900 text-white p-2 rounded hover:bg-slate-800 font-bold">Entrar no Painel</button>
         </div>
 
-        <div id="areaClienteContainer" class="hidden max-w-md mx-auto relative rounded-lg shadow-2xl overflow-hidden bg-white min-h-[500px]">
+        <div id="areaClienteContainer" class="hidden max-w-md mx-auto relative rounded-lg shadow-2xl overflow-hidden bg-white min-h-[600px]">
             
             <div id="introScreen" class="absolute inset-0 z-50 bg-slate-900 flex flex-col items-center justify-center text-center p-8 text-white">
-                <div class="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-blue-500 to-blue-900"></div>
-                <div class="absolute bottom-0 left-0 w-full h-2 bg-gradient-to-r from-blue-900 to-blue-500"></div>
+                
+                <div class="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')] opacity-10"></div>
+                
+                <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/e/e8/New_Holland_Agriculture_logo.svg/2560px-New_Holland_Agriculture_logo.svg.png" 
+                     class="reveal-zoom delay-1 h-14 mb-6 object-contain filter brightness-0 invert opacity-90">
+
+                <div class="reveal-zoom delay-2 text-gray-400 text-xs uppercase tracking-[0.3em] mb-4">Apresenta</div>
 
                 <img src="https://www.fortral.com.br/wp-content/uploads/2025/06/logo.png" 
-                     alt="Logo Fortral" class="h-12 mb-6 object-contain">
+                     class="reveal-zoom delay-2 h-10 mb-10 object-contain">
                 
-                <p class="text-blue-200 uppercase text-xs font-bold tracking-widest mb-2">Você foi convidado para</p>
-                
-                <h1 id="introTitulo" class="text-3xl font-bold mb-4 leading-tight">Carregando...</h1>
-                
-                <div class="bg-slate-800/50 p-4 rounded-lg border border-slate-700 w-full mb-8 backdrop-blur-sm">
-                    <div class="flex items-center justify-center gap-2 text-blue-300 mb-1">
-                        <i class="ph ph-calendar text-xl"></i>
-                        <span class="text-xs uppercase font-bold">Data do Evento</span>
+                <div class="reveal-up delay-3 w-full">
+                    <h1 id="introTitulo" class="text-3xl font-bold mb-2 leading-tight text-blue-100">Carregando...</h1>
+                    
+                    <div class="inline-flex items-center justify-center gap-2 bg-slate-800/80 px-4 py-2 rounded-full border border-slate-700 backdrop-blur-sm mb-8">
+                        <i class="ph ph-calendar text-blue-400"></i>
+                        <span id="introData" class="text-lg font-medium text-white">--/--/----</span>
+                        <span class="text-gray-500 mx-1">|</span>
+                        <span id="introHora" class="text-lg font-medium text-white">--:--</span>
                     </div>
-                    <p id="introData" class="text-xl font-medium text-white">--/--/----</p>
-                    <p id="introHora" class="text-sm text-gray-400">--:--</p>
                 </div>
 
-                <button onclick="abrirFormulario()" class="group relative w-full bg-blue-600 hover:bg-blue-500 text-white font-bold py-4 rounded-lg shadow-lg shadow-blue-900/50 transition-all transform hover:scale-[1.02]">
+                <button onclick="abrirFormulario()" class="reveal-up delay-4 group relative w-full bg-blue-600 hover:bg-blue-500 text-white font-bold py-4 rounded-lg shadow-lg shadow-blue-900/50 transition-all transform hover:scale-[1.02]">
                     <span class="flex items-center justify-center gap-2 text-lg">
-                        CONFIRMAR PRESENÇA <i class="ph ph-arrow-right font-bold group-hover:translate-x-1 transition"></i>
+                        CONFIRMAR PRESENÇA <i class="ph ph-caret-right font-bold group-hover:translate-x-1 transition"></i>
                     </span>
-                    <div class="absolute inset-0 rounded-lg ring-2 ring-white/20 group-hover:ring-white/40 animate-pulse"></div>
                 </button>
             </div>
 
@@ -221,11 +255,8 @@
 
         // --- 3. MÁGICA DA ABERTURA ---
         function abrirFormulario() {
-            // Adiciona classe de fade-out na capa
             const intro = document.getElementById('introScreen');
             intro.classList.add('fade-out');
-            
-            // Aguarda a animação e remove do DOM visualmente
             setTimeout(() => {
                 intro.style.display = 'none';
             }, 800);
@@ -359,8 +390,6 @@
             
             if(!nome || !dataLocal) return alert("Preencha campos.");
             
-            // CORREÇÃO DE FUSO HORÁRIO AQUI:
-            // Convertemos a data local (ex: 10:00) para ISO UTC antes de enviar.
             const dataISO = new Date(dataLocal).toISOString();
 
             const { error } = await supabaseClient.from('eventos').insert([{ nome, data_evento: dataISO }]);
@@ -372,7 +401,6 @@
             const ul = document.getElementById('listaEventosLinks'); ul.innerHTML = "";
             if(data) data.forEach(ev => {
                 const link = window.location.origin + window.location.pathname + "?evento_id=" + ev.id;
-                // Ajuste de exibição
                 const dataFormatada = ev.data_evento ? new Date(ev.data_evento).toLocaleDateString('pt-BR') : 'S/ data';
                 ul.innerHTML += `<li class="bg-white border p-2 flex justify-between items-center text-xs"><span><strong>${ev.nome}</strong> (${dataFormatada})</span><button onclick="navigator.clipboard.writeText('${link}').then(()=>alert('Copiado'))" class="bg-blue-100 text-blue-900 px-2 rounded">Link</button></li>`;
             });
