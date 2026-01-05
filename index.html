@@ -225,7 +225,7 @@
             const intro = document.getElementById('introScreen');
             intro.classList.add('fade-out');
             
-            // Aguarda a animação e remove do DOM visualmente (opcional, o css já resolve o clique)
+            // Aguarda a animação e remove do DOM visualmente
             setTimeout(() => {
                 intro.style.display = 'none';
             }, 800);
@@ -352,13 +352,19 @@
             }
         }
 
-        // Funções de dados Admin (Iguais à versão anterior)
+        // Funções de dados Admin
         async function criarEvento() {
             const nome = document.getElementById('novoEventoNome').value;
-            const dataEv = document.getElementById('novoEventoData').value;
-            if(!nome || !dataEv) return alert("Preencha campos.");
-            const { error } = await supabaseClient.from('eventos').insert([{ nome, data_evento: dataEv }]);
-            if(error) alert(error.message); else { document.getElementById('novoEventoNome').value=""; carregarEventosLinks(); carregarEventosParaSelect(); alert("Criado!"); }
+            const dataLocal = document.getElementById('novoEventoData').value;
+            
+            if(!nome || !dataLocal) return alert("Preencha campos.");
+            
+            // CORREÇÃO DE FUSO HORÁRIO AQUI:
+            // Convertemos a data local (ex: 10:00) para ISO UTC antes de enviar.
+            const dataISO = new Date(dataLocal).toISOString();
+
+            const { error } = await supabaseClient.from('eventos').insert([{ nome, data_evento: dataISO }]);
+            if(error) alert(error.message); else { document.getElementById('novoEventoNome').value=""; document.getElementById('novoEventoData').value=""; carregarEventosLinks(); carregarEventosParaSelect(); alert("Criado!"); }
         }
 
         async function carregarEventosLinks() {
@@ -366,7 +372,9 @@
             const ul = document.getElementById('listaEventosLinks'); ul.innerHTML = "";
             if(data) data.forEach(ev => {
                 const link = window.location.origin + window.location.pathname + "?evento_id=" + ev.id;
-                ul.innerHTML += `<li class="bg-white border p-2 flex justify-between items-center text-xs"><span>${ev.nome}</span><button onclick="navigator.clipboard.writeText('${link}').then(()=>alert('Copiado'))" class="bg-blue-100 text-blue-900 px-2 rounded">Link</button></li>`;
+                // Ajuste de exibição
+                const dataFormatada = ev.data_evento ? new Date(ev.data_evento).toLocaleDateString('pt-BR') : 'S/ data';
+                ul.innerHTML += `<li class="bg-white border p-2 flex justify-between items-center text-xs"><span><strong>${ev.nome}</strong> (${dataFormatada})</span><button onclick="navigator.clipboard.writeText('${link}').then(()=>alert('Copiado'))" class="bg-blue-100 text-blue-900 px-2 rounded">Link</button></li>`;
             });
         }
 
