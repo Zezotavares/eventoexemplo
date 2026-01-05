@@ -10,16 +10,24 @@
     <style>
         .table-container { overflow-x: auto; }
         
-        /* --- ANIMAÇÕES DA INTRODUÇÃO --- */
+        /* --- ANIMAÇÕES --- */
         @keyframes zoomIn { from { opacity: 0; transform: scale(0.5); } to { opacity: 1; transform: scale(1); } }
         @keyframes fadeInUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes slideInRight { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+        
         .reveal-zoom { opacity: 0; animation: zoomIn 1s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
         .reveal-up { opacity: 0; animation: fadeInUp 1s ease-out forwards; }
         .delay-1 { animation-delay: 0.2s; } .delay-2 { animation-delay: 1.2s; } .delay-3 { animation-delay: 2.2s; } .delay-4 { animation-delay: 2.8s; }
         .fade-out { opacity: 0; pointer-events: none; transition: opacity 0.8s ease-in-out; }
+
+        /* Animação do Toast */
+        .toast-enter { animation: slideInRight 0.3s ease-out forwards; }
     </style>
 </head>
 <body class="bg-slate-950 min-h-screen font-sans flex flex-col">
+
+    <div id="toastContainer" class="fixed top-5 right-5 z-[100] flex flex-col gap-3 pointer-events-none">
+        </div>
 
     <div id="mainHeader" class="bg-slate-900 p-4 text-center shadow-md relative z-20 border-b border-slate-800">
         <img src="https://www.fortral.com.br/wp-content/uploads/2025/06/logo.png" 
@@ -80,17 +88,17 @@
                     <input type="hidden" id="eventoIdInput">
                     <div>
                         <label class="block text-xs font-bold text-gray-600 uppercase">Nome Completo</label>
-                        <input type="text" id="clienteNome" required class="w-full p-2 border rounded mt-1 focus:border-blue-900 outline-none bg-gray-50 focus:bg-white transition">
+                        <input type="text" id="clienteNome" class="w-full p-2 border rounded mt-1 focus:border-blue-900 outline-none bg-gray-50 focus:bg-white transition">
                     </div>
                     <div class="flex gap-2">
                         <div class="w-1/2">
                             <label class="block text-xs font-bold text-gray-600 uppercase">CPF</label>
-                            <input type="text" id="clienteCPF" maxlength="14" onkeyup="mascaraCPF(this)" required 
+                            <input type="text" id="clienteCPF" maxlength="14" onkeyup="mascaraCPF(this)" 
                                    placeholder="000.000.000-00" class="w-full p-2 border rounded mt-1 outline-none bg-gray-50 focus:bg-white transition">
                         </div>
                         <div class="w-1/2">
                             <label class="block text-xs font-bold text-gray-600 uppercase">WhatsApp</label>
-                            <input type="tel" id="clienteTelefone" maxlength="15" onkeyup="mascaraTelefone(this)" required 
+                            <input type="tel" id="clienteTelefone" maxlength="15" onkeyup="mascaraTelefone(this)" 
                                    placeholder="(00) 00000-0000" class="w-full p-2 border rounded mt-1 outline-none bg-gray-50 focus:bg-white transition">
                         </div>
                     </div>
@@ -112,17 +120,31 @@
                     </button>
                 </form>
 
-                <div id="msgSucesso" class="hidden text-center py-10 h-full flex flex-col items-center justify-center animate-fade-in">
-                    <div class="w-20 h-20 bg-green-100 text-green-600 rounded-full flex items-center justify-center mx-auto mb-4 shadow-sm">
-                        <i class="ph ph-check text-4xl"></i>
-                    </div>
-                    <h2 class="text-2xl font-bold text-slate-900 mb-2">Tudo Certo!</h2>
-                    <p class="text-gray-600 mb-6 px-4">Sua inscrição foi confirmada na nossa lista.</p>
-                    <div class="bg-gray-50 p-4 rounded-lg border border-gray-200 w-full text-left relative overflow-hidden">
-                        <div class="absolute top-0 left-0 w-1 h-full bg-green-500"></div>
-                        <p class="text-xs text-gray-500 uppercase font-bold mb-1">Evento</p>
-                        <p class="text-slate-900 font-bold text-lg leading-tight mb-2" id="sucessoTitulo"></p>
-                        <p class="text-slate-600 text-sm flex items-center gap-1"><i class="ph ph-calendar"></i> <span id="sucessoDataMsg"></span></p>
+                <div id="msgSucesso" class="hidden flex flex-col items-center justify-center h-full animate-fade-in py-6">
+                    <div class="bg-white w-full max-w-sm rounded-2xl shadow-xl border border-slate-100 overflow-hidden relative">
+                        <div class="bg-green-500 h-2 w-full"></div>
+                        <div class="p-6 text-center">
+                            <div class="w-16 h-16 bg-green-100 text-green-600 rounded-full flex items-center justify-center mx-auto mb-4 animate-bounce shadow-sm">
+                                <i class="ph ph-check-circle text-4xl"></i>
+                            </div>
+                            <h2 class="text-2xl font-black text-slate-800 mb-1 tracking-tight">CONFIRMADO!</h2>
+                            <p class="text-gray-500 text-sm mb-6">Sua presença está garantida.</p>
+                            <div class="bg-slate-50 rounded-xl p-4 border border-slate-200 text-left relative">
+                                <div class="absolute -left-2 top-1/2 w-4 h-4 bg-white rounded-full border-r border-slate-200 transform -translate-y-1/2"></div>
+                                <div class="absolute -right-2 top-1/2 w-4 h-4 bg-white rounded-full border-l border-slate-200 transform -translate-y-1/2"></div>
+                                <p class="text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-1">Evento</p>
+                                <h3 id="sucessoTitulo" class="text-lg font-bold text-slate-900 leading-tight mb-3">Carregando...</h3>
+                                <div class="flex items-center gap-3 text-sm text-slate-700 border-t border-dashed border-gray-300 pt-3">
+                                    <i class="ph ph-calendar-blank text-xl text-blue-600"></i>
+                                    <span id="sucessoDataMsg" class="font-medium">--/--/----</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="bg-slate-50 p-3 text-center border-t border-slate-100">
+                            <p class="text-[10px] text-gray-400 uppercase font-bold flex items-center justify-center gap-1">
+                                <i class="ph ph-camera"></i> Tire um print desta tela
+                            </p>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -144,6 +166,7 @@
                     <i class="ph ph-users-three"></i> Gerenciar Inscritos
                 </button>
             </div>
+            
             <div id="viewEventos" class="hidden p-6">
                 <h3 class="font-bold text-lg text-slate-700 mb-4">Criar Novo Evento</h3>
                 <div class="bg-gray-50 p-4 rounded border mb-6">
@@ -156,6 +179,7 @@
                 <h3 class="font-bold text-lg text-slate-700 mb-2">Links Ativos</h3>
                 <ul id="listaEventosLinks" class="space-y-2 text-sm max-h-60 overflow-y-auto"></ul>
             </div>
+            
             <div id="viewParticipantes" class="p-4 md:p-6">
                 <div class="flex flex-col md:flex-row gap-3 mb-4 items-end">
                     <div class="w-full md:w-1/3">
@@ -199,41 +223,86 @@
         const SENHA_ADMIN = 'Fortral@1993';
         const supabaseClient = supabase.createClient(supabaseUrl, supabaseKey);
 
-        // --- 2. CONTROLE DE TELA ---
+        // --- 2. NOVO SISTEMA DE AVISOS (TOASTS) ---
+        function exibirToast(mensagem, tipo = 'info') {
+            const container = document.getElementById('toastContainer');
+            const card = document.createElement('div');
+            
+            // Configuração de cores e ícones baseados no tipo
+            let corBorda, icone, corFundoIcone, corTextoIcone;
+            
+            if (tipo === 'sucesso') {
+                corBorda = 'border-l-4 border-green-500';
+                icone = 'ph-check-circle';
+                corFundoIcone = 'bg-green-100';
+                corTextoIcone = 'text-green-600';
+            } else if (tipo === 'erro') {
+                corBorda = 'border-l-4 border-red-500';
+                icone = 'ph-warning-circle';
+                corFundoIcone = 'bg-red-100';
+                corTextoIcone = 'text-red-600';
+            } else {
+                corBorda = 'border-l-4 border-yellow-500';
+                icone = 'ph-info';
+                corFundoIcone = 'bg-yellow-100';
+                corTextoIcone = 'text-yellow-600';
+            }
+
+            // HTML do Card de Aviso
+            card.className = `toast-enter pointer-events-auto bg-white shadow-lg rounded-lg p-4 flex items-center gap-3 w-80 ${corBorda}`;
+            card.innerHTML = `
+                <div class="shrink-0 w-8 h-8 ${corFundoIcone} ${corTextoIcone} rounded-full flex items-center justify-center">
+                    <i class="ph ${icone} text-lg"></i>
+                </div>
+                <div class="text-sm font-medium text-slate-700">${mensagem}</div>
+            `;
+
+            container.appendChild(card);
+
+            // Remove o aviso após 4 segundos
+            setTimeout(() => {
+                card.style.opacity = '0';
+                card.style.transform = 'translateX(100%)';
+                card.style.transition = 'all 0.5s ease';
+                setTimeout(() => card.remove(), 500);
+            }, 4000);
+        }
+
+        // --- 3. CONTROLE DE TELA ---
         const areaLogin = document.getElementById('areaLogin');
         const areaClienteContainer = document.getElementById('areaClienteContainer');
         const areaAdmin = document.getElementById('areaAdmin');
-        const mainHeader = document.getElementById('mainHeader'); // Referência ao cabeçalho
+        const mainHeader = document.getElementById('mainHeader');
         
         const urlParams = new URLSearchParams(window.location.search);
         const eventoIdParam = urlParams.get('evento_id');
 
         if (eventoIdParam) {
-            // SE FOR CONVITE: ESCONDE O CABEÇALHO GERAL
             mainHeader.classList.add('hidden');
             iniciarModoCliente(eventoIdParam);
         } else {
-            // SE FOR ADMIN: MANTÉM O CABEÇALHO
             mostrarLogin();
         }
 
-        // --- 3. MÁGICA DA ABERTURA ---
         function abrirFormulario() {
             const intro = document.getElementById('introScreen');
             intro.classList.add('fade-out');
-            setTimeout(() => {
-                intro.style.display = 'none';
-            }, 800);
+            setTimeout(() => { intro.style.display = 'none'; }, 800);
         }
 
         // --- 4. FUNÇÕES GERAIS ---
         function mostrarLogin() { areaLogin.classList.remove('hidden'); }
+        
         function verificarSenha() {
             if (document.getElementById('senhaAdmin').value === SENHA_ADMIN) {
                 areaLogin.classList.add('hidden');
                 iniciarModoAdmin();
-            } else alert("Senha incorreta!");
+                exibirToast('Bem-vindo, Administrador!', 'sucesso'); // Exemplo de uso
+            } else {
+                exibirToast('Senha incorreta! Tente novamente.', 'erro'); // SUBSTITUIU O ALERT
+            }
         }
+        
         function toggleSenha() {
             const input = document.getElementById('senhaAdmin');
             const icon = document.getElementById('iconeOlho');
@@ -243,7 +312,6 @@
         function logout() { location.reload(); }
         function formatarZap(t) { return t.replace(/\D/g, ""); }
 
-        // --- 5. MÓDULO CLIENTE ---
         function mascaraTelefone(i) {
             let v = i.value.replace(/\D/g, "");
             v = v.replace(/^(\d\d)(\d)/g, "($1) $2"); v = v.replace(/(\d{5})(\d)/, "$1-$2"); i.value = v;
@@ -264,10 +332,7 @@
                 document.body.innerHTML = "<div class='text-center mt-10 p-4 font-bold text-white'>Link inválido ou evento encerrado.</div>";
                 return;
             }
-
             areaClienteContainer.classList.remove('hidden');
-            
-            // Preencher CAPA (Intro)
             document.getElementById('introTitulo').innerText = data.nome;
             if (data.data_evento) {
                 const d = new Date(data.data_evento);
@@ -276,23 +341,32 @@
             } else {
                 document.getElementById('introData').innerText = "Data a definir";
             }
-
-            // Preencher Formulário Interno
             document.getElementById('eventoNomeDisplay').innerText = data.nome;
             document.getElementById('eventoIdInput').value = id;
         }
 
         document.getElementById('formCadastro').addEventListener('submit', async (e) => {
             e.preventDefault();
+            
+            // Validações básicas manuais se o 'required' falhar ou para UX melhor
+            const nome = document.getElementById('clienteNome').value;
+            const cpf = document.getElementById('clienteCPF').value;
+            const tel = document.getElementById('clienteTelefone').value;
+
+            if(!nome || !cpf || !tel) {
+                exibirToast('Por favor, preencha todos os campos obrigatórios.', 'aviso');
+                return;
+            }
+
             const btn = document.getElementById('btnSalvar');
             const originalText = btn.innerHTML;
             btn.innerHTML = '<i class="ph ph-spinner animate-spin"></i> Processando...'; btn.disabled = true;
 
             const dados = {
                 evento_id: document.getElementById('eventoIdInput').value,
-                nome: document.getElementById('clienteNome').value,
-                cpf: document.getElementById('clienteCPF').value,
-                telefone: document.getElementById('clienteTelefone').value,
+                nome: nome,
+                cpf: cpf,
+                telefone: tel,
                 email: document.getElementById('clienteEmail').value,
                 acompanhantes_qtd: document.getElementById('clienteQtdAcomp').value || 0,
                 acompanhantes_info: document.getElementById('clienteDadosAcomp').value
@@ -300,30 +374,27 @@
 
             const { data: existe } = await supabaseClient.from('participantes').select('id').eq('evento_id', dados.evento_id).eq('cpf', dados.cpf).maybeSingle();
             if (existe) {
-                alert("Você já está inscrito neste evento!");
+                exibirToast('Você já está inscrito neste evento!', 'aviso'); // SUBSTITUIU O ALERT
                 btn.innerHTML = originalText; btn.disabled = false;
                 return;
             }
 
             const { error } = await supabaseClient.from('participantes').insert([dados]);
             if (error) {
-                alert("Erro: " + error.message);
+                exibirToast('Erro ao salvar: ' + error.message, 'erro'); // SUBSTITUIU O ALERT
                 btn.innerHTML = originalText; btn.disabled = false;
             } else {
-                // Sucesso
                 document.getElementById('formCadastro').classList.add('hidden');
-                document.getElementById('formularioReal').querySelector('.text-center').style.display = 'none'; // esconde cabeçalho form
-                
+                document.getElementById('formularioReal').querySelector('.text-center').style.display = 'none'; 
                 const sucessoDiv = document.getElementById('msgSucesso');
                 sucessoDiv.classList.remove('hidden');
-                
-                // Preencher dados finais
                 document.getElementById('sucessoTitulo').innerText = document.getElementById('introTitulo').innerText;
                 document.getElementById('sucessoDataMsg').innerText = document.getElementById('introData').innerText + " às " + document.getElementById('introHora').innerText;
+                exibirToast('Inscrição realizada com sucesso!', 'sucesso'); // FEEDBACK EXTRA
             }
         });
 
-        // --- 6. MÓDULO ADMIN ---
+        // --- 5. MÓDULO ADMIN ---
         function iniciarModoAdmin() {
             areaAdmin.classList.remove('hidden');
             mudarAba('participantes');
@@ -352,12 +423,23 @@
             const nome = document.getElementById('novoEventoNome').value;
             const dataLocal = document.getElementById('novoEventoData').value;
             
-            if(!nome || !dataLocal) return alert("Preencha campos.");
+            if(!nome || !dataLocal) {
+                exibirToast('Preencha o nome e a data do evento.', 'aviso'); // SUBSTITUIU O ALERT
+                return;
+            }
             
             const dataISO = new Date(dataLocal).toISOString();
-
             const { error } = await supabaseClient.from('eventos').insert([{ nome, data_evento: dataISO }]);
-            if(error) alert(error.message); else { document.getElementById('novoEventoNome').value=""; document.getElementById('novoEventoData').value=""; carregarEventosLinks(); carregarEventosParaSelect(); alert("Criado!"); }
+            
+            if(error) {
+                exibirToast(error.message, 'erro');
+            } else { 
+                document.getElementById('novoEventoNome').value=""; 
+                document.getElementById('novoEventoData').value=""; 
+                carregarEventosLinks(); 
+                carregarEventosParaSelect(); 
+                exibirToast('Evento criado com sucesso!', 'sucesso'); // SUBSTITUIU O ALERT
+            }
         }
 
         async function carregarEventosLinks() {
@@ -366,7 +448,7 @@
             if(data) data.forEach(ev => {
                 const link = window.location.origin + window.location.pathname + "?evento_id=" + ev.id;
                 const dataFormatada = ev.data_evento ? new Date(ev.data_evento).toLocaleDateString('pt-BR') : 'S/ data';
-                ul.innerHTML += `<li class="bg-white border p-2 flex justify-between items-center text-xs"><span><strong>${ev.nome}</strong> (${dataFormatada})</span><button onclick="navigator.clipboard.writeText('${link}').then(()=>alert('Copiado'))" class="bg-blue-100 text-blue-900 px-2 rounded">Link</button></li>`;
+                ul.innerHTML += `<li class="bg-white border p-2 flex justify-between items-center text-xs"><span><strong>${ev.nome}</strong> (${dataFormatada})</span><button onclick="navigator.clipboard.writeText('${link}').then(()=>exibirToast('Link copiado!', 'sucesso'))" class="bg-blue-100 text-blue-900 px-2 rounded">Link</button></li>`;
             });
         }
 
@@ -407,17 +489,30 @@
         }
 
         async function deletarParticipante(id) {
-            if(!confirm("Excluir cadastro?")) return;
-            if(prompt("Senha Admin:") !== SENHA_ADMIN) return alert("Senha errada.");
-            await supabaseClient.from('participantes').delete().eq('id', id);
-            carregarParticipantesPainel();
+            if(!confirm("Excluir cadastro permanentemente?")) return;
+            // Para exclusão, mantive o prompt nativo por segurança, mas o feedback de erro/sucesso usa toast
+            const senha = prompt("Confirme a senha de admin:"); 
+            if(senha !== SENHA_ADMIN) {
+                exibirToast("Senha incorreta. Exclusão cancelada.", "erro");
+                return;
+            }
+            const { error } = await supabaseClient.from('participantes').delete().eq('id', id);
+            if (error) {
+                exibirToast(error.message, 'erro');
+            } else {
+                carregarParticipantesPainel();
+                exibirToast('Participante excluído.', 'sucesso');
+            }
         }
 
         async function exportarExcel() {
             let q = supabaseClient.from('participantes').select('nome, cpf, telefone, email, acompanhantes_qtd, acompanhantes_info, eventos(nome, data_evento)').order('data_cadastro');
             const evId = document.getElementById('filtroEvento').value; if(evId) q = q.eq('evento_id', evId);
             const { data } = await q;
-            if(!data || !data.length) return alert("Sem dados.");
+            if(!data || !data.length) {
+                exibirToast("Sem dados para exportar.", "aviso");
+                return;
+            }
             let csv = "\uFEFFNome;CPF;Telefone;Email;Qtd Acomp;Nomes Acomp;Evento;Data\n";
             data.forEach(r => {
                 const esc = t => '"' + String(t||"").replace(/"/g, '""') + '"';
@@ -425,6 +520,7 @@
                 csv += `${esc(r.nome)};${esc(r.cpf)};${esc(r.telefone)};${esc(r.email)};${r.acompanhantes_qtd};${esc(r.acompanhantes_info)};${esc(r.eventos?.nome)};${dt}\n`;
             });
             const a = document.createElement("a"); a.href = URL.createObjectURL(new Blob([csv], {type: 'text/csv;charset=utf-8;'})); a.download = `Relatorio_${new Date().toISOString().slice(0,10)}.csv`; a.click();
+            exibirToast("Download iniciado!", "sucesso");
         }
     </script>
 </body>
