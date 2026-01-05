@@ -21,10 +21,14 @@
 </head>
 <body class="bg-slate-950 min-h-screen font-sans flex flex-col">
 
-    <div class="max-w-4xl mx-auto mt-10 px-4 pb-10 w-full flex-grow relative">
+    <div id="mainHeader" class="bg-slate-900 p-4 text-center shadow-md relative z-20 border-b border-slate-800">
+        <img src="https://www.fortral.com.br/wp-content/uploads/2025/06/logo.png" 
+             alt="Logo Fortral" class="h-8 mx-auto object-contain">
+    </div>
 
-        <div id="areaLogin" class="hidden max-w-sm mx-auto bg-white p-6 rounded-lg shadow-lg text-center relative z-10">
-            <img src="https://www.fortral.com.br/wp-content/uploads/2025/06/logo.png" alt="Logo Fortral" class="h-8 mx-auto object-contain mb-4">
+    <div class="max-w-4xl mx-auto mt-6 px-4 pb-10 w-full flex-grow relative">
+
+        <div id="areaLogin" class="hidden max-w-sm mx-auto bg-white p-6 rounded-lg shadow-lg text-center relative z-10 mt-10">
             <div class="bg-blue-50 p-3 rounded text-blue-900 text-sm mb-4 flex items-center justify-center gap-2">
                 <i class="ph ph-lock-key text-xl"></i> <span>Acesso Administrativo</span>
             </div>
@@ -41,19 +45,15 @@
         <div id="areaClienteContainer" class="hidden max-w-md mx-auto relative rounded-lg shadow-2xl overflow-hidden bg-white min-h-[600px]">
             
             <div id="introScreen" class="absolute inset-0 z-50 bg-slate-900 flex flex-col items-center justify-center text-center p-8 text-white">
-                
                 <div class="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')] opacity-10"></div>
                 
                 <div class="reveal-zoom delay-1 flex flex-col items-center mb-10">
-                    <img src="https://www.fortral.com.br/wp-content/uploads/2025/06/logo.png" 
-                         class="h-16 mb-4 object-contain">
-                    
+                    <img src="https://www.fortral.com.br/wp-content/uploads/2025/06/logo.png" class="h-16 mb-4 object-contain">
                     <h2 class="text-blue-200 text-sm uppercase tracking-[0.3em] font-bold">CONVIDA PARA</h2>
                 </div>
                 
                 <div class="reveal-up delay-2 w-full">
                     <h1 id="introTitulo" class="text-3xl font-bold mb-4 leading-tight text-white drop-shadow-lg">Carregando...</h1>
-                    
                     <div class="inline-flex items-center justify-center gap-2 bg-slate-800/80 px-4 py-2 rounded-full border border-slate-700 backdrop-blur-sm mb-8">
                         <i class="ph ph-calendar text-blue-400"></i>
                         <span id="introData" class="text-lg font-medium text-white">--/--/----</span>
@@ -71,8 +71,8 @@
 
             <div id="formularioReal" class="p-6 h-full flex flex-col">
                 <div class="text-center mb-6 border-b pb-4 relative">
-                    <img src="https://www.fortral.com.br/wp-content/uploads/2025/06/logo.png" alt="Logo Fortral" class="h-6 mx-auto mb-2">
-                    <h2 class="text-xl font-bold text-slate-900" id="eventoNomeDisplay">Inscrição</h2>
+                    <h3 class="text-slate-900 font-black uppercase tracking-widest text-lg mb-2">FORTRAL</h3>
+                    <h2 class="text-xl font-bold text-slate-700" id="eventoNomeDisplay">Inscrição</h2>
                     <p class="text-gray-500 text-xs mt-1">Preencha seus dados abaixo</p>
                 </div>
 
@@ -98,7 +98,6 @@
                         <label class="block text-xs font-bold text-gray-600 uppercase">E-mail</label>
                         <input type="email" id="clienteEmail" class="w-full p-2 border rounded mt-1 outline-none bg-gray-50 focus:bg-white transition">
                     </div>
-                    
                     <div class="bg-blue-50 p-3 rounded border border-blue-100">
                         <div class="flex justify-between items-center mb-2">
                             <label class="text-sm font-bold text-blue-900">Vai levar acompanhantes?</label>
@@ -108,7 +107,6 @@
                             <textarea id="clienteDadosAcomp" rows="2" class="w-full p-2 border rounded text-sm mt-2 focus:border-blue-900 outline-none" placeholder="Nome dos acompanhantes..."></textarea>
                         </div>
                     </div>
-
                     <button type="submit" id="btnSalvar" class="w-full bg-slate-900 text-white p-3 rounded hover:bg-slate-800 font-bold text-lg transition shadow-md mt-2">
                         Finalizar Inscrição
                     </button>
@@ -120,7 +118,6 @@
                     </div>
                     <h2 class="text-2xl font-bold text-slate-900 mb-2">Tudo Certo!</h2>
                     <p class="text-gray-600 mb-6 px-4">Sua inscrição foi confirmada na nossa lista.</p>
-                    
                     <div class="bg-gray-50 p-4 rounded-lg border border-gray-200 w-full text-left relative overflow-hidden">
                         <div class="absolute top-0 left-0 w-1 h-full bg-green-500"></div>
                         <p class="text-xs text-gray-500 uppercase font-bold mb-1">Evento</p>
@@ -134,12 +131,11 @@
         <div id="areaAdmin" class="hidden bg-white rounded-lg shadow-xl overflow-hidden min-h-[500px]">
             <div class="bg-slate-800 text-white p-4 flex justify-between items-center">
                 <div class="flex items-center gap-2">
-                    <img src="https://www.fortral.com.br/wp-content/uploads/2025/06/logo.png" alt="Logo" class="h-6 brightness-0 invert">
+                    <div class="bg-blue-600 p-1.5 rounded-full"><i class="ph ph-user-gear text-lg"></i></div>
                     <span class="font-bold">Painel Gerencial</span>
                 </div>
                 <button onclick="logout()" class="text-xs text-red-300 hover:text-white border border-red-900 hover:bg-red-900 px-3 py-1 rounded transition">Sair</button>
             </div>
-
             <div class="flex border-b">
                 <button onclick="mudarAba('eventos')" id="tabEventos" class="flex-1 py-3 font-bold text-slate-600 border-b-2 border-transparent hover:bg-gray-50 bg-gray-100">
                     <i class="ph ph-calendar-plus"></i> Meus Eventos
@@ -148,7 +144,6 @@
                     <i class="ph ph-users-three"></i> Gerenciar Inscritos
                 </button>
             </div>
-
             <div id="viewEventos" class="hidden p-6">
                 <h3 class="font-bold text-lg text-slate-700 mb-4">Criar Novo Evento</h3>
                 <div class="bg-gray-50 p-4 rounded border mb-6">
@@ -161,7 +156,6 @@
                 <h3 class="font-bold text-lg text-slate-700 mb-2">Links Ativos</h3>
                 <ul id="listaEventosLinks" class="space-y-2 text-sm max-h-60 overflow-y-auto"></ul>
             </div>
-
             <div id="viewParticipantes" class="p-4 md:p-6">
                 <div class="flex flex-col md:flex-row gap-3 mb-4 items-end">
                     <div class="w-full md:w-1/3">
@@ -209,13 +203,17 @@
         const areaLogin = document.getElementById('areaLogin');
         const areaClienteContainer = document.getElementById('areaClienteContainer');
         const areaAdmin = document.getElementById('areaAdmin');
+        const mainHeader = document.getElementById('mainHeader'); // Referência ao cabeçalho
         
         const urlParams = new URLSearchParams(window.location.search);
         const eventoIdParam = urlParams.get('evento_id');
 
         if (eventoIdParam) {
+            // SE FOR CONVITE: ESCONDE O CABEÇALHO GERAL
+            mainHeader.classList.add('hidden');
             iniciarModoCliente(eventoIdParam);
         } else {
+            // SE FOR ADMIN: MANTÉM O CABEÇALHO
             mostrarLogin();
         }
 
@@ -356,7 +354,6 @@
             
             if(!nome || !dataLocal) return alert("Preencha campos.");
             
-            // CORREÇÃO: Fuso horário (envia ISO UTC)
             const dataISO = new Date(dataLocal).toISOString();
 
             const { error } = await supabaseClient.from('eventos').insert([{ nome, data_evento: dataISO }]);
