@@ -11,54 +11,20 @@
         .table-container { overflow-x: auto; }
         
         /* --- ANIMAÇÕES DA INTRODUÇÃO --- */
-        
-        /* 1. Zoom In (Para os Logos) */
-        @keyframes zoomIn {
-            from { opacity: 0; transform: scale(0.5); }
-            to { opacity: 1; transform: scale(1); }
-        }
-
-        /* 2. Fade In Up (Para textos) */
-        @keyframes fadeInUp {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        /* Classes utilitárias para aplicar a animação */
-        .reveal-zoom {
-            opacity: 0; /* Começa invisível */
-            animation: zoomIn 1s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-        }
-        
-        .reveal-up {
-            opacity: 0; /* Começa invisível */
-            animation: fadeInUp 1s ease-out forwards;
-        }
-
-        /* Delays (Tempos de espera para cada item) */
-        .delay-1 { animation-delay: 0.2s; } /* New Holland */
-        .delay-2 { animation-delay: 1.2s; } /* Fortral */
-        .delay-3 { animation-delay: 2.2s; } /* Título Evento */
-        .delay-4 { animation-delay: 2.8s; } /* Botão */
-
-        /* Saída suave da capa */
-        .fade-out {
-            opacity: 0;
-            pointer-events: none;
-            transition: opacity 0.8s ease-in-out;
-        }
+        @keyframes zoomIn { from { opacity: 0; transform: scale(0.5); } to { opacity: 1; transform: scale(1); } }
+        @keyframes fadeInUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        .reveal-zoom { opacity: 0; animation: zoomIn 1s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+        .reveal-up { opacity: 0; animation: fadeInUp 1s ease-out forwards; }
+        .delay-1 { animation-delay: 0.2s; } .delay-2 { animation-delay: 1.2s; } .delay-3 { animation-delay: 2.2s; } .delay-4 { animation-delay: 2.8s; }
+        .fade-out { opacity: 0; pointer-events: none; transition: opacity 0.8s ease-in-out; }
     </style>
 </head>
-<body class="bg-gray-100 min-h-screen font-sans flex flex-col">
+<body class="bg-slate-950 min-h-screen font-sans flex flex-col">
 
-    <div class="bg-slate-900 p-4 text-center shadow-md relative z-0">
-        <img src="https://www.fortral.com.br/wp-content/uploads/2025/06/logo.png" 
-             alt="Logo Fortral" class="h-10 mx-auto object-contain mb-2">
-    </div>
+    <div class="max-w-4xl mx-auto mt-10 px-4 pb-10 w-full flex-grow relative">
 
-    <div class="max-w-4xl mx-auto mt-6 px-4 pb-10 w-full flex-grow relative">
-
-        <div id="areaLogin" class="hidden max-w-sm mx-auto bg-white p-6 rounded-lg shadow-lg text-center mt-10 relative z-10">
+        <div id="areaLogin" class="hidden max-w-sm mx-auto bg-white p-6 rounded-lg shadow-lg text-center relative z-10">
+            <img src="https://www.fortral.com.br/wp-content/uploads/2025/06/logo.png" alt="Logo Fortral" class="h-8 mx-auto object-contain mb-4">
             <div class="bg-blue-50 p-3 rounded text-blue-900 text-sm mb-4 flex items-center justify-center gap-2">
                 <i class="ph ph-lock-key text-xl"></i> <span>Acesso Administrativo</span>
             </div>
@@ -81,7 +47,7 @@
                 <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/e/e8/New_Holland_Agriculture_logo.svg/2560px-New_Holland_Agriculture_logo.svg.png" 
                      class="reveal-zoom delay-1 h-14 mb-6 object-contain filter brightness-0 invert opacity-90">
 
-                <div class="reveal-zoom delay-2 text-gray-400 text-xs uppercase tracking-[0.3em] mb-4">Apresenta</div>
+                <div class="reveal-zoom delay-2 text-blue-300 text-sm uppercase tracking-[0.3em] font-bold mb-4">Fortral</div>
 
                 <img src="https://www.fortral.com.br/wp-content/uploads/2025/06/logo.png" 
                      class="reveal-zoom delay-2 h-10 mb-10 object-contain">
@@ -105,7 +71,8 @@
             </div>
 
             <div id="formularioReal" class="p-6 h-full flex flex-col">
-                <div class="text-center mb-6 border-b pb-4">
+                <div class="text-center mb-6 border-b pb-4 relative">
+                    <img src="https://www.fortral.com.br/wp-content/uploads/2025/06/logo.png" alt="Logo Fortral" class="h-6 mx-auto mb-2">
                     <h2 class="text-xl font-bold text-slate-900" id="eventoNomeDisplay">Inscrição</h2>
                     <p class="text-gray-500 text-xs mt-1">Preencha seus dados abaixo</p>
                 </div>
@@ -168,7 +135,7 @@
         <div id="areaAdmin" class="hidden bg-white rounded-lg shadow-xl overflow-hidden min-h-[500px]">
             <div class="bg-slate-800 text-white p-4 flex justify-between items-center">
                 <div class="flex items-center gap-2">
-                    <div class="bg-blue-600 p-1.5 rounded-full"><i class="ph ph-user-gear text-lg"></i></div>
+                    <img src="https://www.fortral.com.br/wp-content/uploads/2025/06/logo.png" alt="Logo" class="h-6 brightness-0 invert">
                     <span class="font-bold">Painel Gerencial</span>
                 </div>
                 <button onclick="logout()" class="text-xs text-red-300 hover:text-white border border-red-900 hover:bg-red-900 px-3 py-1 rounded transition">Sair</button>
@@ -297,7 +264,7 @@
         async function iniciarModoCliente(id) {
             const { data, error } = await supabaseClient.from('eventos').select('*').eq('id', id).single();
             if (error || !data) {
-                document.body.innerHTML = "<div class='text-center mt-10 p-4 font-bold text-slate-800'>Link inválido ou evento encerrado.</div>";
+                document.body.innerHTML = "<div class='text-center mt-10 p-4 font-bold text-white'>Link inválido ou evento encerrado.</div>";
                 return;
             }
 
